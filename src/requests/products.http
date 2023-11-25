@@ -4,11 +4,9 @@
 @contentType = application/json
 
 
-###
-
 ### [C]reate new product:
 POST http://@{{host}}/products
-Content-Type: @{{contentType}}
+Content-Type: application/json
 
 {
   "name": "Kubek",
@@ -24,9 +22,15 @@ GET http://@{{host}}/products
 ### [R]ead product:
 GET http://@{{host}}/products/2
 
+### [R]ead product - not existed:
+GET http://@{{host}}/products/100
+
+### [R]ead product - wrong parameter:
+GET http://@{{host}}/products/something
+
 ### [U]pdate product
 PATCH http://@{{host}}/products/2
-Content-Type: @{{contentType}}
+Content-Type: application/json
 
 {
   "description": "100% Porcelana"
