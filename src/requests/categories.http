@@ -1,0 +1,53 @@
+@hostname = localhost
+@port = 3000
+@host = {{hostname}}:{{port}}
+@contentType = application/json
+
+###
+
+GET http://@{{host}}/categories
+
+###
+GET http://@{{host}}/categories/2
+
+###
+GET http://@{{host}}/categories/7
+
+### Test blednego id ktory jest stringiem
+GET http://localhost:3000/categories/something
+
+###
+GET http://@{{host}}/categories/73
+
+###
+
+POST http://@{{host}}/categories/
+Content-Type: application/json
+
+{
+  "name": "Art"
+}
+
+###
+
+DELETE http://@{{host}}/categories/8
+
+
+https://ticktick.com/oauth/authorize?scope=tasks:write tasks:read&client_id=2D6Mc3Rsy7s4SBPcg3&state=state&redirect_uri=https://api.mateuszniestroj.pl/auth&response_type=code
+
+
+### Testowanie poprawności body
+POST http://@{{host}}/categories
+Content-Type: application/json
+
+{"name": ""}
+
+### Testowanie poprawności body #2 - hack my id!
+POST http://@{{host}}/categories
+Content-Type: application/json
+
+{
+  "id": 2,
+  "name": "Troll!",
+  "troll": "true"
+}

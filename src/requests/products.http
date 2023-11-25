@@ -1,0 +1,36 @@
+@hostname = localhost
+@port = 3000
+@host = {{hostname}}:{{port}}
+@contentType = application/json
+
+
+###
+
+### [C]reate new product:
+POST http://@{{host}}/products
+Content-Type: @{{contentType}}
+
+{
+  "name": "Kubek",
+  "price": 18.25,
+  "description": "Napij się prosto z Cuba",
+  "image": "https://picsum.photos/id/30/1280/901",
+  "stock": 10
+}
+
+### [R]ead products:
+GET http://@{{host}}/products
+
+### [R]ead product:
+GET http://@{{host}}/products/2
+
+### [U]pdate product
+PATCH http://@{{host}}/products/2
+Content-Type: @{{contentType}}
+
+{
+  "description": "100% Porcelana"
+}
+
+### [D]elete product
+DELETE http://@{{host}}/products/1
