@@ -9,24 +9,13 @@ import {
   ParseIntPipe,
   Post,
 } from '@nestjs/common';
-import { NewCategoryDto } from './new-category-dto';
-
-interface Category {
-  id: number;
-  name: string;
-}
+import { NewCategoryDto } from './dto/new-category-dto';
+import { categoryList } from './category-list';
+import { Category } from './category.interface';
 
 @Controller('categories')
-export class AppController {
-  private categories: Category[] = [
-    { id: 1, name: 'Groceries' },
-    { id: 2, name: 'Cosmetics' },
-    { id: 3, name: 'Toys' },
-    { id: 4, name: 'Dairy' },
-    { id: 5, name: 'Fashion' },
-    { id: 6, name: 'Electronics' },
-    { id: 7, name: 'Games' },
-  ];
+export class CategoriesController {
+  private categories: Category[] = categoryList;
 
   private nextId = 8;
 
