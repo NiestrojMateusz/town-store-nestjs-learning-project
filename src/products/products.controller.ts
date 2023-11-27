@@ -5,78 +5,46 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  NotFoundException,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
-import { productList } from './product-list';
 import { NewProductDto } from './dto/new-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './product.interface';
+import { UpdateProductDto } from './dto/update-product.dto';
+import { ProductsService } from './products.service';
 
 @Controller('products')
 export class ProductsController {
-  private products: Product[] = productList;
-  private productId: number = productList.length;
+  constructor(private productsService: ProductsService) {}
 
-  findProduct(id: number): Product {
-    const product = this.products.find((p) => p.id === id);
-    if (!product) {
-      throw new NotFoundException(`Product with id: ${id} not found`);
-    }
-    return product;
+  @Post()
+  addNew(@Body() product: NewProductDto): Product {
+    return this.productsService.createNew(product);
   }
 
   @Get()
-  findAll() {
-    return this.products;
+  getAll(@Query('name') searchByName: string): Product[] {
+    return this.productsService.getAll(searchByName);
   }
 
-  @Get(':id')
-  findById(
-    @Param(
-      'id',
-      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
-    )
-    id: number,
-  ) {
-    const product = this.findProduct(id);
-    return product;
+  @Get(':productId')
+  getOne(@Param('productId') productId: number): Product {
+    return this.productsService.getOneById(productId);
   }
 
-  @Post()
-  createProduct(@Body() product: NewProductDto) {
-    const newProduct: Product = {
-      id: this.productId++,
-      stock: 0,
-      ...product,
-    };
-    this.products.push(newProduct);
-    return newProduct;
-  }
-
-  @Patch(':id')
-  updateProduct(
-    @Param('id') productId: number,
+  @Patch(':productId')
+  update(
+    @Param('productId') productId: number,
     @Body() product: UpdateProductDto,
-  ) {
-    const productToUpdate = this.findProduct(productId);
-    Object.assign(productToUpdate, product);
-    return productToUpdate;
+  ): Product {
+    return this.productsService.update(productId, product);
   }
 
-  @Delete(':id')
+  @Delete(':productId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  removeProduct(
-    @Param(
-      'id',
-      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
-    )
-    productId: number,
-  ) {
-    this.findProduct(productId);
-    this.products = this.products.filter((p) => p.id !== productId);
+  remove(@Param('productId') productId: number): void {
+    return this.productsService.removeById(productId);
   }
 }
