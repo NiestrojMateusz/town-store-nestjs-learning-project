@@ -3,11 +3,17 @@ import { productList } from './product-list';
 import { Product } from './product.interface';
 import { NewProductDto } from './dto/new-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { CategoriesService } from 'src/categories/categories.service';
 
 @Injectable()
 export class ProductsService {
-  private productId: number = productList.length;
   private products: Product[] = productList;
+
+  constructor(private categoriesService: CategoriesService) {}
+
+  private generateNextId(): number {
+    return Math.max(...this.products.map((c) => c.id)) + 1;
+  }
 
   private findProduct(id: number): Product {
     const product = this.products.find((p) => p.id === id);
@@ -18,8 +24,9 @@ export class ProductsService {
   }
 
   createNew(product: NewProductDto): Product {
+    this.categoriesService.getOneById(product.categoryId);
     const newProduct: Product = {
-      id: this.productId++,
+      id: this.generateNextId(),
       stock: 0,
       ...product,
     };
@@ -27,7 +34,7 @@ export class ProductsService {
     return newProduct;
   }
 
-  getAll(name: string = ''): Product[] {
+  getAll(name: string = ''): readonly Product[] {
     return this.products.filter((p) =>
       p.name.toLowerCase().includes(name.toLowerCase()),
     );
@@ -39,6 +46,9 @@ export class ProductsService {
 
   update(id: number, partialProduct: UpdateProductDto) {
     const productToUpdate = this.findProduct(id);
+    if (partialProduct.categoryId) {
+      this.categoriesService.getOneById(partialProduct.categoryId);
+    }
     Object.assign(productToUpdate, partialProduct);
     return productToUpdate;
   }

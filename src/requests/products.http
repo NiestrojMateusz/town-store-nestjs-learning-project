@@ -13,7 +13,8 @@ Content-Type: application/json
   "price": 18.25,
   "description": "Napij się prosto z Cuba",
   "image": "https://picsum.photos/id/30/1280/901",
-  "stock": 10
+  "stock": 10,
+  "categoryId": 2
 }
 
 ### [R]ead products:

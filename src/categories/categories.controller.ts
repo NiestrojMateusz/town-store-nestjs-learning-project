@@ -4,30 +4,23 @@ import {
   Delete,
   Get,
   HttpStatus,
-  NotFoundException,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
 } from '@nestjs/common';
 import { NewCategoryDto } from './dto/new-category-dto';
-import { categoryList } from './category-list';
 import { Category } from './category.interface';
+import { CategoriesService } from './categories.service';
+import { UpdateCategoryDto } from './dto/update-category-dto';
 
 @Controller('categories')
 export class CategoriesController {
-  private categories: Category[] = categoryList;
-
-  private nextId = 8;
-
-  private getCategoryById(categoryId: number) {
-    const category = this.categories.find((c) => c.id === categoryId);
-
-    return category;
-  }
+  constructor(private categoriesService: CategoriesService) {}
 
   @Get()
-  getAll(): Category[] {
-    return this.categories;
+  getAll(): readonly Category[] {
+    return this.categoriesService.getAll();
   }
 
   @Get(':id')
@@ -38,32 +31,24 @@ export class CategoriesController {
     )
     categoryId: number,
   ) {
-    const category = this.getCategoryById(categoryId);
-
-    if (!category) {
-      throw new NotFoundException(`category with id: ${categoryId} not found`);
-    }
-
-    return category;
+    return this.categoriesService.getOneById(categoryId);
   }
 
   @Post()
   addNewCategory(@Body() payload: NewCategoryDto) {
-    const category: Category = { ...payload, id: this.nextId++ };
-    this.categories.push(category);
-    return category;
+    return this.categoriesService.createNew(payload);
   }
 
   @Delete(':id')
   delateCategory(@Param('id') categoryId: number) {
-    const category = this.getCategoryById(categoryId);
+    return this.categoriesService.removeById(categoryId);
+  }
 
-    if (!category) {
-      throw new NotFoundException(`category with id: ${categoryId} not found`);
-    }
-
-    this.categories = this.categories.filter((cat) => cat.id !== category.id);
-
-    return { id: categoryId, removed: true };
+  @Patch(':categoryId')
+  update(
+    @Param('categoryId') categoryId: number,
+    @Body() category: UpdateCategoryDto,
+  ): Category {
+    return this.categoriesService.update(categoryId, category);
   }
 }
