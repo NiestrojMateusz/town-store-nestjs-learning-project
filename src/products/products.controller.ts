@@ -5,7 +5,9 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Logger,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -15,13 +17,24 @@ import { Product } from './product.interface';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
 
+import * as fsp from 'node:fs/promises';
+
 @Controller('products')
 export class ProductsController {
+  private logger = new Logger(ProductsController.name);
   constructor(private productsService: ProductsService) {}
 
   @Post()
   addNew(@Body() product: NewProductDto): Product {
+    this.logger.log('About to add');
+    this.logger.log(product);
     return this.productsService.createNew(product);
+  }
+
+  @Get('test-file')
+  async getAllFromFile() {
+    const fileData = await fsp.readFile('not-existing-file.txt');
+    return { fileData };
   }
 
   @Get()
@@ -30,7 +43,13 @@ export class ProductsController {
   }
 
   @Get(':productId')
-  getOne(@Param('productId') productId: number): Product {
+  getOne(
+    @Param(
+      'productId',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    productId: number,
+  ): Product {
     return this.productsService.getOneById(productId);
   }
 

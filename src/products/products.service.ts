@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { productList } from './product-list';
 import { Product } from './product.interface';
 import { NewProductDto } from './dto/new-product.dto';
@@ -8,7 +8,7 @@ import { CategoriesService } from 'src/categories/categories.service';
 @Injectable()
 export class ProductsService {
   private products: Product[] = productList;
-
+  private logger = new Logger(ProductsService.name);
   constructor(private categoriesService: CategoriesService) {}
 
   private generateNextId(): number {
@@ -31,6 +31,7 @@ export class ProductsService {
       ...product,
     };
     this.products.push(newProduct);
+    this.logger.log(`Created product with id: ${newProduct.id}`);
     return newProduct;
   }
 
@@ -41,6 +42,12 @@ export class ProductsService {
   }
 
   getOneById(id: number) {
+    this.logger.verbose(`Read product id: ${id}`);
+    this.logger.debug(`Read product id: ${id}`);
+    this.logger.log(`Read product id: ${id}`);
+    this.logger.warn(`Read product id: ${id}`);
+    this.logger.error(`Read product id: ${id}`);
+    this.logger.fatal(`Read product id: ${id}`);
     return this.findProduct(id);
   }
 

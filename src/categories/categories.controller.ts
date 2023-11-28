@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   HttpStatus,
+  Logger,
   Param,
   ParseIntPipe,
   Patch,
@@ -16,6 +17,8 @@ import { UpdateCategoryDto } from './dto/update-category-dto';
 
 @Controller('categories')
 export class CategoriesController {
+  private logger = new Logger(CategoriesController.name);
+
   constructor(private categoriesService: CategoriesService) {}
 
   @Get()
@@ -31,6 +34,7 @@ export class CategoriesController {
     )
     categoryId: number,
   ) {
+    this.logger.debug('Get category');
     return this.categoriesService.getOneById(categoryId);
   }
 
