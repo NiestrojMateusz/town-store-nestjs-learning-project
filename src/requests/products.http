@@ -7,6 +7,7 @@
 ### [C]reate new product:
 POST http://@{{host}}/products
 Content-Type: application/json
+Authorization: Bearer cbbU7yWFGznUx6V4gxq1a
 
 {
   "name": "Kubek",
@@ -46,3 +47,15 @@ GET http://localhost:3000/products?name=atu
 
 ### [R]ead products (Expect ERROR):
 GET http://localhost:3000/products/test-file
+
+### [R]ead product (with some fake cookies):
+GET http://localhost:3000/products/1
+Set-Cookie: sessionId=38afes7a8; orderId=12;
+Accept-Language: pl
+
+### [R]ead products (Expect sample error):
+GET http://localhost:3000/products/sample-error
+
+### [R]ead products (Expect sample error in polish):
+GET http://localhost:3000/products/sample-error
+Accept-Language: pl

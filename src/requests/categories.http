@@ -31,9 +31,7 @@ Content-Type: application/json
 ###
 
 DELETE http://@{{host}}/categories/8
-
-
-https://ticktick.com/oauth/authorize?scope=tasks:write tasks:read&client_id=2D6Mc3Rsy7s4SBPcg3&state=state&redirect_uri=https://api.mateuszniestroj.pl/auth&response_type=code
+Authorization: Bearer cbbU7yWFGznUx6V4gxq1a
 
 
 ### Testowanie poprawności body
@@ -45,6 +43,7 @@ Content-Type: application/json
 ### Testowanie poprawności body #2 - hack my id!
 POST http://@{{host}}/categories
 Content-Type: application/json
+Authorization: Bearer cbbU7yWFGznUx6V4gxq1a
 
 {
   "id": 2,
