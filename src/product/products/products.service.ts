@@ -3,7 +3,7 @@ import { productList } from './product-list';
 import { Product } from './product.interface';
 import { NewProductDto } from './dto/new-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { CategoriesService } from 'src/categories/categories.service';
+import { CategoriesService } from 'src/product/categories/categories.service';
 
 @Injectable()
 export class ProductsService {
