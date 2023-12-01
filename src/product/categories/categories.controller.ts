@@ -24,7 +24,7 @@ export class CategoriesController {
   constructor(private categoriesService: CategoriesService) {}
 
   @Get()
-  getAll(): readonly Category[] {
+  getAll(): Promise<Category[]> {
     return this.categoriesService.getAll();
   }
 
@@ -56,7 +56,7 @@ export class CategoriesController {
   update(
     @Param('categoryId') categoryId: number,
     @Body() category: UpdateCategoryDto,
-  ): Category {
+  ): Promise<Category> {
     return this.categoriesService.update(categoryId, category);
   }
 }

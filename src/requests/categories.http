@@ -23,6 +23,7 @@ GET http://@{{host}}/categories/73
 
 POST http://@{{host}}/categories/
 Content-Type: application/json
+Authorization: Bearer cbbU7yWFGznUx6V4gxq1a
 
 {
   "name": "Art"
