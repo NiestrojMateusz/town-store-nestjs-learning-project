@@ -31,7 +31,7 @@ export class ProductsController {
 
   @Post()
   @UseGuards(ApiKeyGuard)
-  addNew(@Body() product: NewProductDto): Product {
+  addNew(@Body() product: NewProductDto): Promise<Product> {
     this.logger.log('About to add');
     this.logger.log(product);
     return this.productsService.createNew(product);
@@ -53,7 +53,7 @@ export class ProductsController {
   }
 
   @Get()
-  getAll(@Query('name') searchByName: string): readonly Product[] {
+  getAll(@Query('name') searchByName: string): Promise<Product[]> {
     return this.productsService.getAll(searchByName);
   }
 
@@ -64,7 +64,7 @@ export class ProductsController {
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
     )
     productId: number,
-  ): Product {
+  ): Promise<Product> {
     return this.productsService.getOneById(productId);
   }
 
@@ -76,7 +76,7 @@ export class ProductsController {
     )
     productId: number,
     @Body() product: UpdateProductDto,
-  ): Product {
+  ): Promise<Product> {
     return this.productsService.update(productId, product);
   }
 
@@ -88,7 +88,7 @@ export class ProductsController {
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
     )
     productId: number,
-  ): void {
+  ): Promise<void> {
     return this.productsService.removeById(productId);
   }
 }

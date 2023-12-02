@@ -17,12 +17,12 @@ export class NewProductDto {
   price: number;
 
   @IsUrl({ require_protocol: true })
-  image: string;
+  img_url: string;
 
   @IsNumber()
   @IsInt()
   @IsPositive()
-  categoryId: number;
+  category_id: number;
 
   @IsString()
   @IsOptional()
