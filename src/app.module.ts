@@ -13,6 +13,8 @@ import { ProductModule } from './product/product.module';
 import { OrdersModule } from './orders/orders.module';
 import { SharedModule } from './shared/shared.module';
 import { DatabaseModule } from './database/database.module';
+import { ProductModel } from './product/products/product.model';
+import { CategoryModel } from './product/categories/category.model';
 @Module({
   imports: [
     /* klasy innych modułów */
@@ -43,6 +45,14 @@ import { DatabaseModule } from './database/database.module';
     {
       provide: APP_FILTER,
       useClass: AllErrorsFilter,
+    },
+    {
+      provide: 'ProductModel',
+      useValue: ProductModel,
+    },
+    {
+      provide: 'CategoryModel',
+      useValue: CategoryModel,
     },
   ],
 })

@@ -3,68 +3,65 @@ import {
   Inject,
   Injectable,
   Logger,
-  NotFoundException,
 } from '@nestjs/common';
-import { Category } from './category.interface';
+import { ModelClass } from 'objection';
+import { CategoryModel } from './category.model';
 import { NewCategoryDto } from './dto/new-category-dto';
 import { UpdateCategoryDto } from './dto/update-category-dto';
-import { Knex } from 'knex';
 
 @Injectable()
 export class CategoriesService {
   private logger = new Logger(CategoriesService.name);
 
-  constructor(@Inject('DbConnection') private readonly knex: Knex) {}
+  constructor(
+    @Inject('CategoryModel')
+    private readonly categoryModel: ModelClass<CategoryModel>,
+  ) {}
 
-  private async findCategory(id: number): Promise<Category> {
+  private async find(id: number): Promise<CategoryModel> {
     this.logger.debug(`Searching for category ${id}`);
-    const category = await this.knex<Category>('categories')
-      .where({ id })
-      .first();
-    if (!category) {
-      throw new NotFoundException(`category with id: ${id} not found`);
-    }
-    return category;
+    return this.categoryModel
+      .query()
+      .findById(id)
+      .throwIfNotFound(`category with id: ${id} not found`);
   }
 
-  getAll(): Promise<Category[]> {
-    return this.knex<Category>('categories');
+  async getAll(name: string = '') {
+    return this.categoryModel.query().whereLike('name', `%${name}%`);
   }
 
-  getOneById(id: number): Promise<Category> {
-    return this.findCategory(id);
-  }
-
-  async createNew(category: NewCategoryDto): Promise<Category> {
+  async addNew(categoryDto: NewCategoryDto): Promise<CategoryModel> {
     try {
-      const [newOne] = await this.knex<Category>('categories').insert({
-        ...category,
+      return await this.categoryModel.query().insert({
+        ...categoryDto,
       });
-      return this.getOneById(newOne);
     } catch (error) {
+      this.logger.log(error.constructor.name);
       if (error?.code === 'SQLITE_CONSTRAINT_UNIQUE') {
         throw new BadRequestException(
-          `Category named "${category.name}" already exist`,
+          `Category named "${categoryDto.name}" already exist`,
         );
       }
       throw error;
     }
   }
 
-  async update(
-    id: number,
-    partialCategory: UpdateCategoryDto,
-  ): Promise<Category> {
-    const categoryToUpdate = await this.findCategory(id);
-    Object.assign(categoryToUpdate, partialCategory);
-
-    return await this.knex('categories').where({ id }).update(categoryToUpdate);
+  getOneById(id: number): Promise<CategoryModel> {
+    return this.find(id);
   }
 
   async removeById(id: number): Promise<{ id: number; removed: number }> {
     await this.getOneById(id);
-    const removed = await this.knex('categories').where({ id }).delete();
+    const removed = await this.categoryModel.query().deleteById(id);
     this.logger.log(`Removing category ${id}`);
     return { id, removed };
+  }
+
+  async update(
+    id: number,
+    partialCategory: UpdateCategoryDto,
+  ): Promise<CategoryModel> {
+    const category = await this.categoryModel.query().findById(id);
+    return category.$query().updateAndFetch(partialCategory);
   }
 }

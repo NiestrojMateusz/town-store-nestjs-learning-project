@@ -1,46 +1,50 @@
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { Product } from './product.interface';
 import { NewProductDto } from './dto/new-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CategoriesService } from 'src/product/categories/categories.service';
-import { Knex } from 'knex';
+import { ProductModel } from './product.model';
+import { ModelClass } from 'objection';
 
 @Injectable()
 export class ProductsService {
   private logger = new Logger(ProductsService.name);
   constructor(
-    @Inject('DbConnection') private readonly knex: Knex,
     private categoriesService: CategoriesService,
+    @Inject('ProductModel')
+    private readonly productModel: ModelClass<ProductModel>,
   ) {}
 
-  private async findProduct(id: number): Promise<Product> {
+  private async findProduct(id: number) {
     this.logger.debug(`Searching for product ${id}`);
 
-    const product = await this.knex<Product>('products').where({ id }).first();
+    // const product = await this.knex<Product>('products').where({ id }).first();
+    const product = await this.productModel
+      .query()
+      .findById(id)
+      .withGraphFetched('category')
+      .throwIfNotFound(`Product with id: ${id} not found`);
 
     if (!product) {
       throw new NotFoundException(`Product with id: ${id} not found`);
     }
+
     return product;
   }
 
-  async createNew(product: NewProductDto): Promise<Product> {
-    this.categoriesService.getOneById(product.category_id);
+  async createNew(product: NewProductDto) {
+    this.categoriesService.getOneById(product.categoryId);
 
-    const newProductIds = await this.knex('products').insert(product);
-    this.logger.log(`Created product with id: ${newProductIds[0]}`);
+    const newProduct = await this.productModel.query().insert({
+      stock: 0,
+      ...product,
+    });
+    this.logger.log(`Created product with id: ${newProduct.id}`);
 
-    return this.knex('products').where({ id: newProductIds[0] }).first();
+    return newProduct;
   }
 
-  async getAll(name: string = ''): Promise<Product[]> {
-    let products = this.knex<Product>('products').select('*');
-
-    if (name) {
-      products = products.where('name', 'like', `%${name}%`);
-    }
-
-    return products;
+  async getAll(name: string = '') {
+    return this.productModel.query().whereLike('name', `%${name}%`);
   }
 
   getOneById(id: number) {
@@ -54,19 +58,15 @@ export class ProductsService {
   }
 
   async update(id: number, partialProduct: UpdateProductDto) {
-    const productToUpdate = await this.findProduct(id);
-    Object.assign(productToUpdate, partialProduct);
-    if (partialProduct.category_id) {
-      await this.categoriesService.getOneById(partialProduct.category_id);
+    if (partialProduct.categoryId) {
+      await this.categoriesService.getOneById(partialProduct.categoryId);
     }
-    await this.knex<Product>('products').where({ id }).update(productToUpdate);
-
-    return productToUpdate;
+    const product = await this.productModel.query().findById(id);
+    return product.$query().updateAndFetch(partialProduct);
   }
 
-  async removeById(id: number): Promise<void> {
+  async removeById(id: number): Promise<number> {
     await this.findProduct(id);
-    await this.knex('products').where({ id }).delete();
-    this.logger.log(`Removing product ${id}`);
+    return this.productModel.query().deleteById(id);
   }
 }

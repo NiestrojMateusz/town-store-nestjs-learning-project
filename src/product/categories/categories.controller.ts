@@ -12,10 +12,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { NewCategoryDto } from './dto/new-category-dto';
-import { Category } from './category.interface';
 import { CategoriesService } from './categories.service';
 import { UpdateCategoryDto } from './dto/update-category-dto';
 import { ApiKeyGuard } from 'src/guards/api-key.guard';
+import { CategoryModel } from './category.model';
 
 @Controller('categories')
 export class CategoriesController {
@@ -24,7 +24,7 @@ export class CategoriesController {
   constructor(private categoriesService: CategoriesService) {}
 
   @Get()
-  getAll(): Promise<Category[]> {
+  getAll(): Promise<CategoryModel[]> {
     return this.categoriesService.getAll();
   }
 
@@ -43,7 +43,7 @@ export class CategoriesController {
   @Post()
   @UseGuards(ApiKeyGuard)
   addNewCategory(@Body() payload: NewCategoryDto) {
-    return this.categoriesService.createNew(payload);
+    return this.categoriesService.addNew(payload);
   }
 
   @Delete(':id')
@@ -56,7 +56,7 @@ export class CategoriesController {
   update(
     @Param('categoryId') categoryId: number,
     @Body() category: UpdateCategoryDto,
-  ): Promise<Category> {
+  ) {
     return this.categoriesService.update(categoryId, category);
   }
 }

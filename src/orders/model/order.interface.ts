@@ -1,5 +1,3 @@
-import { Product } from 'src/product/products/product.interface';
-
 export interface Order {
   id: number;
   madeAt: Date;
@@ -10,6 +8,6 @@ export interface Order {
 
 export interface ProductInOrder {
   id: number;
-  productId: Product['id'];
+  productId: number;
   quantity: number;
 }

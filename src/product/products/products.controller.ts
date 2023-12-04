@@ -15,7 +15,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { NewProductDto } from './dto/new-product.dto';
-import { Product } from './product.interface';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
 
@@ -31,7 +30,7 @@ export class ProductsController {
 
   @Post()
   @UseGuards(ApiKeyGuard)
-  addNew(@Body() product: NewProductDto): Promise<Product> {
+  addNew(@Body() product: NewProductDto) {
     this.logger.log('About to add');
     this.logger.log(product);
     return this.productsService.createNew(product);
@@ -53,7 +52,7 @@ export class ProductsController {
   }
 
   @Get()
-  getAll(@Query('name') searchByName: string): Promise<Product[]> {
+  getAll(@Query('name') searchByName: string) {
     return this.productsService.getAll(searchByName);
   }
 
@@ -64,7 +63,7 @@ export class ProductsController {
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
     )
     productId: number,
-  ): Promise<Product> {
+  ) {
     return this.productsService.getOneById(productId);
   }
 
@@ -76,7 +75,7 @@ export class ProductsController {
     )
     productId: number,
     @Body() product: UpdateProductDto,
-  ): Promise<Product> {
+  ) {
     return this.productsService.update(productId, product);
   }
 
@@ -88,7 +87,7 @@ export class ProductsController {
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
     )
     productId: number,
-  ): Promise<void> {
+  ): Promise<number> {
     return this.productsService.removeById(productId);
   }
 }
