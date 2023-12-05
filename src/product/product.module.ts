@@ -20,6 +20,6 @@ import { CategoryModel } from './categories/category.model';
       useValue: CategoryModel,
     },
   ],
-  exports: [ProductsService],
+  exports: [ProductsService, 'ProductModel', 'CategoryModel'],
 })
 export class ProductModule {}

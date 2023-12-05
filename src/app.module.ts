@@ -9,15 +9,12 @@ import { APP_FILTER } from '@nestjs/core';
 import { AllErrorsFilter } from './errors/all-errors.filter';
 import { CookieCheckMiddleware } from './middleware/cookie-check.middleware';
 import { LanguageExtractorMiddleware } from './middleware/language-extractor.middleware';
-import { ProductModule } from './product/product.module';
 import { OrdersModule } from './orders/orders.module';
 import { SharedModule } from './shared/shared.module';
 import { DatabaseModule } from './database/database.module';
-import { ProductModel } from './product/products/product.model';
-import { CategoryModel } from './product/categories/category.model';
+import { ProductModule } from './product/product.module';
 @Module({
   imports: [
-    /* klasy innych modułów */
     LoggerModule.forRoot({
       pinoHttp: {
         level: 'debug',
@@ -28,31 +25,18 @@ import { CategoryModel } from './product/categories/category.model';
         quietReqLogger: true,
       },
     }),
-    ProductModule,
     OrdersModule,
     SharedModule,
     DatabaseModule,
+    ProductModule,
   ],
-  controllers: [
-    /* klasy kontrolerów w tym module */
-    CategoriesController,
-    ProductsController,
-  ],
+  controllers: [CategoriesController, ProductsController],
   providers: [
-    /* klasy serwisów w tym module */
     ProductsService,
     CategoriesService,
     {
       provide: APP_FILTER,
       useClass: AllErrorsFilter,
-    },
-    {
-      provide: 'ProductModel',
-      useValue: ProductModel,
-    },
-    {
-      provide: 'CategoryModel',
-      useValue: CategoryModel,
     },
   ],
 })
