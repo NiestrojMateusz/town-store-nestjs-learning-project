@@ -49,11 +49,6 @@ export class ProductsService {
 
   getOneById(id: number) {
     this.logger.verbose(`Read product id: ${id}`);
-    this.logger.debug(`Read product id: ${id}`);
-    this.logger.log(`Read product id: ${id}`);
-    this.logger.warn(`Read product id: ${id}`);
-    this.logger.error(`Read product id: ${id}`);
-    this.logger.fatal(`Read product id: ${id}`);
     return this.findProduct(id);
   }
 
