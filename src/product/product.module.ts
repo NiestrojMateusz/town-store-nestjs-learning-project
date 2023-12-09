@@ -21,5 +21,6 @@ import { CategoryModel } from './categories/category.model';
     },
   ],
   exports: [ProductsService, 'ProductModel', 'CategoryModel'],
+  // exports: [ProductsService],
 })
 export class ProductModule {}

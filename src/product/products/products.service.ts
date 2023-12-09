@@ -1,13 +1,19 @@
-import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { NewProductDto } from './dto/new-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { CategoriesService } from 'src/product/categories/categories.service';
+import { CategoriesService } from '../categories/categories.service';
 import { ProductModel } from './product.model';
 import { ModelClass } from 'objection';
 
 @Injectable()
 export class ProductsService {
   private logger = new Logger(ProductsService.name);
+
   constructor(
     private categoriesService: CategoriesService,
     @Inject('ProductModel')
@@ -15,36 +21,32 @@ export class ProductsService {
   ) {}
 
   private async findProduct(id: number) {
-    this.logger.debug(`Searching for product ${id}`);
-
-    // const product = await this.knex<Product>('products').where({ id }).first();
-    const product = await this.productModel
+    return this.productModel
       .query()
       .findById(id)
-      .withGraphFetched('category')
       .throwIfNotFound(`Product with id: ${id} not found`);
-
-    if (!product) {
-      throw new NotFoundException(`Product with id: ${id} not found`);
-    }
-
-    return product;
   }
 
   async createNew(product: NewProductDto) {
-    this.categoriesService.getOneById(product.categoryId);
-
+    await this.categoriesService.getOneById(product.categoryId);
     const newProduct = await this.productModel.query().insert({
       stock: 0,
       ...product,
     });
     this.logger.log(`Created product with id: ${newProduct.id}`);
-
     return newProduct;
   }
 
   async getAll(name: string = '') {
     return this.productModel.query().whereLike('name', `%${name}%`);
+  }
+
+  async checkProductOnStock(id: number, quantity: number) {
+    const product = await this.findProduct(id);
+    if (product.stock < quantity) {
+      throw new BadRequestException(`Product :${id} is out of stock.`);
+    }
+    return product;
   }
 
   getOneById(id: number) {
@@ -60,7 +62,7 @@ export class ProductsService {
     return product.$query().updateAndFetch(partialProduct);
   }
 
-  async removeById(id: number): Promise<number> {
+  async removeById(id: number) {
     await this.findProduct(id);
     return this.productModel.query().deleteById(id);
   }

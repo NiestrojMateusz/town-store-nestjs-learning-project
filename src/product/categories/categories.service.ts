@@ -7,7 +7,6 @@ import {
 import { ModelClass } from 'objection';
 import { CategoryModel } from './category.model';
 import { NewCategoryDto } from './dto/new-category-dto';
-import { UpdateCategoryDto } from './dto/update-category-dto';
 
 @Injectable()
 export class CategoriesService {
@@ -55,13 +54,5 @@ export class CategoriesService {
     const removed = await this.categoryModel.query().deleteById(id);
     this.logger.log(`Removing category ${id}`);
     return { id, removed };
-  }
-
-  async update(
-    id: number,
-    partialCategory: UpdateCategoryDto,
-  ): Promise<CategoryModel> {
-    const category = await this.categoryModel.query().findById(id);
-    return category.$query().updateAndFetch(partialCategory);
   }
 }

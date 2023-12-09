@@ -7,13 +7,13 @@ import {
   Logger,
   Param,
   ParseIntPipe,
-  Patch,
+  // Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
 import { NewCategoryDto } from './dto/new-category-dto';
 import { CategoriesService } from './categories.service';
-import { UpdateCategoryDto } from './dto/update-category-dto';
+// import { UpdateCategoryDto } from './dto/update-category-dto';
 import { ApiKeyGuard } from 'src/guards/api-key.guard';
 import { CategoryModel } from './category.model';
 
@@ -52,11 +52,11 @@ export class CategoriesController {
     return this.categoriesService.removeById(categoryId);
   }
 
-  @Patch(':categoryId')
-  update(
-    @Param('categoryId') categoryId: number,
-    @Body() category: UpdateCategoryDto,
-  ) {
-    return this.categoriesService.update(categoryId, category);
-  }
+  // @Patch(':categoryId')
+  // update(
+  //   @Param('categoryId') categoryId: number,
+  //   @Body() category: UpdateCategoryDto,
+  // ) {
+  //   return this.categoriesService.update(categoryId, category);
+  // }
 }
