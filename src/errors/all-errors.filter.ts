@@ -44,11 +44,24 @@ export class AllErrorsFilter implements ExceptionFilter {
         'EISDIR',
       ].includes(exception?.code)
     ) {
-      return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      const responseObj: {
+        message: string;
+        error: string;
+        statusCode: HttpStatus;
+        exception?: typeof exception;
+      } = {
         message: 'File i/o error (check logs)',
         error: 'Internal Server Error',
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      });
+      };
+
+      if (process.env.NODE_ENV === 'development') {
+        responseObj.exception = exception;
+      }
+
+      return response
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .json(responseObj);
     }
     // Jeśli to nieznany błąd (inny niż HttpException):
     response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({

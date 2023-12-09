@@ -1,4 +1,5 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ProductsController } from './product/products/products.controller';
 import { CategoriesController } from './product/categories/categories.controller';
 import { ProductsService } from './product/products/products.service';
@@ -13,17 +14,28 @@ import { OrdersModule } from './orders/orders.module';
 import { SharedModule } from './shared/shared.module';
 import { DatabaseModule } from './database/database.module';
 import { ProductModule } from './product/product.module';
+import { validationSchema } from './config.schema';
 @Module({
   imports: [
-    LoggerModule.forRoot({
-      pinoHttp: {
-        level: 'debug',
-        useLevel: 'debug',
-        transport: {
-          target: path.resolve(__dirname, 'pino-pretty-config.js'),
-        },
-        quietReqLogger: true,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validationSchema,
+      validationOptions: {
+        abortEarly: true,
       },
+    }),
+    LoggerModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService<NodeJS.AppEnv>) => ({
+        pinoHttp: {
+          level: configService.get('LOG_LEVEL'),
+          useLevel: 'debug',
+          transport: {
+            target: path.resolve(__dirname, 'pino-pretty-config.js'),
+          },
+          quietReqLogger: true,
+        },
+      }),
     }),
     OrdersModule,
     SharedModule,

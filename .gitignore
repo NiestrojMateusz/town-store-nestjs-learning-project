@@ -35,3 +35,4 @@ lerna-debug.log*
 !.vscode/extensions.json
 
 town-store-db.sqlite3
+.env
